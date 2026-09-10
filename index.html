@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Antes de conocerte</title>
+<meta property="og:title" content="Antes de conocerte">
+<meta property="og:description" content="Un pequeño recuerdo para ti.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,400&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+
+  /* ============================================================
+     EDITA AQUÍ TUS DATOS — busca la palabra "CONFIG" más abajo
+     en el <script> al final del archivo. Ahí cambias nombres,
+     fecha y los enlaces de los videos. No hace falta tocar nada
+     de lo que hay entre estas líneas de estilo.
+  ============================================================ */
+
+  :root{
+    --ink:#14140f;
+    --paper:#f2ead9;
+    --paper-dim:#d9cfb6;
+    --brass:#a9803c;
+    --clay:#b96b52;
+    --line: rgba(242,234,217,0.16);
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Work Sans', sans-serif;
+    font-weight:300;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
+  }
+
+  h1,h2,.display{
+    font-family:'Fraunces', serif;
+    font-weight:400;
+    margin:0;
+    letter-spacing:0.01em;
+  }
+
+  .scene{
+    position:fixed;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:8vh 7vw;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 1.1s ease;
+  }
+  .scene.active{
+    opacity:1;
+    pointer-events:auto;
+  }
+  .scene.paper{
+    background:var(--paper);
+    color:var(--ink);
+  }
+
+  .eyebrow{
+    font-size:0.78rem;
+    letter-spacing:0.14em;
+    color:var(--brass);
+    margin-bottom:1.6rem;
+    font-weight:400;
+  }
+  .scene.paper .eyebrow{ color:var(--clay); }
+
+  .title-xl{
+    font-size:clamp(2.4rem, 8vw, 5rem);
+    line-height:1.05;
+    max-width:16ch;
+  }
+
+  .title-md{
+    font-size:clamp(1.6rem, 5vw, 2.6rem);
+    line-height:1.15;
+    max-width:18ch;
+  }
+
+  .subtitle{
+    margin-top:1.4rem;
+    font-size:clamp(1rem, 2.4vw, 1.2rem);
+    color:var(--paper-dim);
+    max-width:34ch;
+    line-height:1.6;
+  }
+  .scene.paper .subtitle{ color:#4a4436; }
+
+  .body-text{
+    font-size:clamp(1rem, 2.2vw, 1.15rem);
+    line-height:1.85;
+    max-width:38ch;
+    color:var(--paper-dim);
+  }
+  .scene.paper .body-text{ color:#3b362a; }
+
+  .signature{
+    margin-top:2.2rem;
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-size:1.3rem;
+    color:var(--paper);
+  }
+  .scene.paper .signature{ color:var(--ink); }
+
+  button.advance{
+    margin-top:3rem;
+    background:none;
+    border:1px solid var(--line);
+    color:var(--paper);
+    font-family:'Work Sans', sans-serif;
+    font-weight:400;
+    font-size:0.95rem;
+    letter-spacing:0.03em;
+    padding:0.9rem 2.2rem;
+    border-radius:2px;
+    cursor:pointer;
+    transition:background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+  }
+  button.advance:hover{
+    background:var(--paper);
+    color:var(--ink);
+    border-color:var(--paper);
+  }
+  .scene.paper button.advance{
+    color:var(--ink);
+    border-color:rgba(20,20,15,0.25);
+  }
+  .scene.paper button.advance:hover{
+    background:var(--ink);
+    color:var(--paper);
+    border-color:var(--ink);
+  }
+
+  .countdown{
+    font-family:'Fraunces', serif;
+    font-size:clamp(3.5rem, 14vw, 7rem);
+    font-weight:300;
+    color:var(--paper);
+    min-height:1.2em;
+  }
+
+  .divider{
+    width:34px;
+    height:1px;
+    background:var(--brass);
+    margin:1.8rem 0;
+  }
+
+  .video-wrap{
+    width:min(92vw, 900px);
+    aspect-ratio:16/9;
+    background:#000;
+    border:1px solid var(--line);
+  }
+  .video-wrap video, .video-wrap iframe{
+    width:100%;
+    height:100%;
+    display:block;
+    border:none;
+  }
+
+  .video-caption{
+    margin-top:1.6rem;
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-size:1.15rem;
+    color:var(--paper-dim);
+  }
+
+  .progress-dots{
+    position:fixed;
+    bottom:5vh;
+    left:0; right:0;
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    z-index:20;
+  }
+  .progress-dots span{
+    width:5px; height:5px;
+    border-radius:50%;
+    background:var(--line);
+    transition:background 0.4s ease;
+  }
+  .progress-dots span.done{ background:var(--brass); }
+
+  .names{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-size:clamp(1rem, 2.6vw, 1.3rem);
+    color:var(--brass);
+    margin-top:0.6rem;
+  }
+
+  .days-count{
+    font-family:'Fraunces', serif;
+    font-size:clamp(2.2rem, 7vw, 3.4rem);
+    margin-top:0.4rem;
+  }
+
+  .skip-hint{
+    position:fixed;
+    top:5vh; right:5vw;
+    font-size:0.72rem;
+    letter-spacing:0.06em;
+    color:var(--paper-dim);
+    opacity:0.5;
+    cursor:pointer;
+    z-index:20;
+  }
+</style>
+</head>
+<body>
+
+<div class="skip-hint" id="skipHint">silenciar música</div>
+<div class="progress-dots" id="dots"></div>
+<audio id="bgMusic" loop preload="auto"></audio>
+
+<!-- 0. PORTADA -->
+<section class="scene active" data-scene="0">
+  <div class="eyebrow" id="dateLabel"></div>
+  <h1 class="title-xl">Antes de<br>conocerte</h1>
+  <div class="names" id="namesLabel"></div>
+  <button class="advance" onclick="startExperience()">Entrar</button>
+</section>
+
+<!-- 1. PREPARACIÓN -->
+<section class="scene" data-scene="1">
+  <div class="eyebrow">antes de empezar</div>
+  <h2 class="title-md">Ponte cómoda.<br>Sube un poco el volumen.</h2>
+  <p class="subtitle">Estás a punto de volver a uno de esos momentos que solo ocurren una vez.</p>
+  <button class="advance" onclick="next()">Continuar</button>
+</section>
+
+<!-- 2. DEDICATORIA -->
+<section class="scene paper" data-scene="2">
+  <div class="eyebrow">una nota antes de empezar</div>
+  <p class="body-text" id="dedicationText"></p>
+  <p class="signature" id="signatureText"></p>
+  <button class="advance" onclick="next()">Seguir</button>
+</section>
+
+<!-- 3. COUNTDOWN -->
+<section class="scene" data-scene="3">
+  <div class="eyebrow">ahora sí</div>
+  <div class="countdown" id="countdownNumber">5</div>
+</section>
+
+<!-- 4. VIDEO 1 -->
+<section class="scene" data-scene="4">
+  <div class="eyebrow" id="video1Eyebrow">las apuestas de la familia</div>
+  <div class="video-wrap" id="video1Wrap"></div>
+  <p class="video-caption" id="video1Caption"></p>
+  <button class="advance" onclick="next()">Continuar</button>
+</section>
+
+<!-- 5. TRANSICIÓN -->
+<section class="scene" data-scene="5">
+  <h2 class="title-md">Ya todos habían apostado.</h2>
+  <div class="divider"></div>
+  <p class="subtitle">Ahora faltaba solamente una cosa: saber quién tenía razón.</p>
+  <button class="advance" onclick="next()">Ver el momento</button>
+</section>
+
+<!-- 6. VIDEO 2 -->
+<section class="scene" data-scene="6">
+  <div class="eyebrow" id="video2Eyebrow">el momento</div>
+  <div class="video-wrap" id="video2Wrap"></div>
+  <p class="video-caption" id="video2Caption"></p>
+  <button class="advance" onclick="next()">Continuar</button>
+</section>
+
+<!-- 7. CIERRE -->
+<section class="scene paper" data-scene="7">
+  <div class="eyebrow">y así comenzó una nueva historia</div>
+  <p class="body-text" id="closingText"></p>
+  <div class="days-count" id="daysCount"></div>
+  <p class="subtitle" style="margin-top:0.3rem;">han pasado desde aquel día</p>
+</section>
+
+<script>
+/* ============================================================
+   CONFIG — edita SOLO esta parte con tus datos reales.
+   ============================================================ */
+const CONFIG = {
+  // Nombre(s) de la pareja, como quieres que aparezca bajo el título
+  names: "Campos · Gigante",
+
+  // Música de fondo (opcional). Pon la ruta a tu archivo mp3, por ejemplo "assets/musica.mp3".
+  // Si lo dejas vacío (""), simplemente no habrá música.
+  musicUrl: "",
+  musicVolume: 0.35,
+
+  // Fecha real del gender reveal, formato AAAA-MM-DD
+  eventDate: "2026-08-29",
+
+  // Texto que aparece encima del título en la portada (se genera solo si lo dejas vacío)
+  dateLabelOverride: "", // ej: "10 de agosto, 2026 — Caracas"
+
+  // Tu dedicatoria (pantalla 2)
+  dedication: "Gracias por confiar en mí para guardar este momento. Fue un privilegio poder estar detrás de la cámara mientras ustedes descubrían algo que cambiará para siempre la historia de su familia. Espero que cuando vuelvan a ver esto dentro de muchos años, puedan sentir aunque sea un poquito de lo que sintieron ese día.",
+  signature: "Con muchísimo cariño, Toto",
+
+  // VIDEOS
+  // type: "drive" para un video subido a Google Drive (recomendado si el audio tiene copyright),
+  //       "youtube" para YouTube no listado, o "file" para un archivo mp4 directo.
+  video1: {
+    type: "drive",             // "drive" | "youtube" | "file"
+    src: "PON_AQUI_TU_ID_O_URL_1", // si es drive: solo el ID del archivo (lo que va entre /d/ y /view). Si es youtube: el ID del video. Si es file: la URL o ruta del mp4
+    caption: "Antes de saberlo, cada uno tenía su corazonada."
+  },
+  video2: {
+    type: "drive",
+    src: "PON_AQUI_TU_ID_O_URL_2",
+    caption: "El instante exacto en que lo supieron."
+  },
+
+  // Mensaje de cierre (pantalla final)
+  closing: "Quizás algún día vuelvan a abrir este pequeño rincón de internet. Y quizás esa personita que todavía no conocen pueda ver cómo comenzó todo: cómo se veían, cómo sonaban sus voces, cuánta emoción había ese día — y cuánto amor ya existía antes de que ella llegara."
+};
+/* ============================================================
+   A partir de aquí ya no hace falta que edites nada.
+   ============================================================ */
+
+const scenes = document.querySelectorAll('.scene');
+let current = 0;
+let musicOn = true;
+let musicStarted = false;
+const bgMusic = document.getElementById('bgMusic');
+
+function setupMusic(){
+  if (!CONFIG.musicUrl){
+    document.getElementById('skipHint').style.display = 'none';
+    return;
+  }
+  bgMusic.src = CONFIG.musicUrl;
+  bgMusic.volume = CONFIG.musicVolume;
+}
+
+function startExperience(){
+  if (CONFIG.musicUrl && !musicStarted){
+    bgMusic.play().catch(()=>{});
+    musicStarted = true;
+  }
+  next();
+}
+
+function toggleMusic(){
+  musicOn = !musicOn;
+  document.getElementById('skipHint').textContent = musicOn ? 'silenciar música' : 'activar música';
+  if (musicOn){
+    if (current !== 4 && current !== 6) bgMusic.play().catch(()=>{});
+  } else {
+    bgMusic.pause();
+  }
+}
+
+function renderDots(){
+  const dotsEl = document.getElementById('dots');
+  scenes.forEach((_, i) => {
+    const d = document.createElement('span');
+    if (i <= current) d.classList.add('done');
+    dotsEl.appendChild(d);
+  });
+}
+renderDots();
+
+function goTo(index){
+  scenes.forEach(s => s.classList.remove('active'));
+  scenes[index].classList.add('active');
+  current = index;
+  document.querySelectorAll('.progress-dots span').forEach((d,i)=>{
+    d.classList.toggle('done', i <= index);
+  });
+  if (index === 3) runCountdown();
+
+  if (CONFIG.musicUrl){
+    if (index === 4 || index === 6){
+      bgMusic.pause();
+    } else if (musicOn && musicStarted){
+      bgMusic.play().catch(()=>{});
+    }
+  }
+}
+
+function next(){
+  if (current < scenes.length - 1) goTo(current + 1);
+}
+
+// Fill in text content from CONFIG
+document.getElementById('namesLabel').textContent = CONFIG.names;
+document.getElementById('dedicationText').textContent = CONFIG.dedication;
+document.getElementById('signatureText').textContent = CONFIG.signature;
+document.getElementById('video1Caption').textContent = CONFIG.video1.caption;
+document.getElementById('video2Caption').textContent = CONFIG.video2.caption;
+document.getElementById('closingText').textContent = CONFIG.closing;
+
+const eventDateObj = new Date(CONFIG.eventDate + 'T00:00:00');
+const dateLabelText = CONFIG.dateLabelOverride || eventDateObj.toLocaleDateString('es-ES', { day:'numeric', month:'long', year:'numeric' });
+document.getElementById('dateLabel').textContent = dateLabelText;
+
+// Days since event
+const daysSince = Math.max(0, Math.floor((Date.now() - eventDateObj.getTime()) / 86400000));
+document.getElementById('daysCount').textContent = daysSince.toLocaleString('es-ES') + (daysSince === 1 ? ' día' : ' días');
+
+// Countdown
+function runCountdown(){
+  const el = document.getElementById('countdownNumber');
+  let n = 5;
+  el.textContent = n;
+  const timer = setInterval(() => {
+    n -= 1;
+    if (n > 0){
+      el.textContent = n;
+    } else {
+      clearInterval(timer);
+      goTo(4);
+    }
+  }, 900);
+}
+
+// Build video embeds
+function buildVideoEmbed(wrapId, videoConfig){
+  const wrap = document.getElementById(wrapId);
+  if (videoConfig.type === 'youtube'){
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://www.youtube.com/embed/${videoConfig.src}?rel=0`;
+    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+    iframe.allowFullscreen = true;
+    wrap.appendChild(iframe);
+  } else if (videoConfig.type === 'drive'){
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://drive.google.com/file/d/${videoConfig.src}/preview`;
+    iframe.allow = "autoplay";
+    iframe.allowFullscreen = true;
+    wrap.appendChild(iframe);
+  } else {
+    const video = document.createElement('video');
+    video.src = videoConfig.src;
+    video.controls = true;
+    video.playsInline = true;
+    wrap.appendChild(video);
+  }
+}
+buildVideoEmbed('video1Wrap', CONFIG.video1);
+buildVideoEmbed('video2Wrap', CONFIG.video2);
+
+// When scene 4 or 6 becomes active, auto-play its video
+const observer = new MutationObserver(() => {
+  const activeScene = document.querySelector('.scene.active');
+  if (!activeScene) return;
+  const idx = activeScene.getAttribute('data-scene');
+  if (idx === '4' || idx === '6'){
+    const mediaEl = activeScene.querySelector('video, iframe');
+    if (mediaEl && mediaEl.tagName === 'VIDEO') mediaEl.play().catch(()=>{});
+  }
+  // auto-advance from video scenes only when the viewer clicks — kept manual on purpose
+});
+observer.observe(document.body, { attributes:true, subtree:true, attributeFilter:['class'] });
+
+// Allow clicking anywhere on video scenes to reveal a "continue" affordance after video ends (basic: click video wrap area outside player advances)
+document.getElementById('video1Wrap').addEventListener('click', (e)=>{ if(e.target.id==='video1Wrap') next(); });
+
+// Keyboard: right arrow / space advances
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') next();
+});
+
+// Skip hint now acts as a music mute/unmute toggle
+document.getElementById('skipHint').addEventListener('click', toggleMusic);
+setupMusic();
+</script>
+</body>
+</html>
